@@ -1,0 +1,76 @@
+Você vai criar o Backend e o Frontend do projeto GeoMatch — Sistema de Normalização e Validação de Endereços com Failover Multi-Provedor. O objetivo é criar um MVP funcional, **backend em Python/FastAPI** e **frontend em React.js separado**, sem integração com n8n por enquanto.
+
+## Estrutura sugerida do projeto
+
+geo_match/
+├─ backend/
+│  ├─ main.py               # FastAPI app principal
+│  ├─ routes/
+│  │   ├─ upload.py         # Endpoints para upload de CSV/SQL
+│  │   ├─ addresses.py      # Endpoints CRUD de endereços
+│  │   └─ export.py         # Endpoints para exportação CSV/SQL
+│  ├─ models.py             # Modelos Pydantic para validação
+│  ├─ database.py           # Conexão com banco PostgreSQL ou SQLite
+│  ├─ services/
+│  │   ├─ parser.py         # Funções de parsing e normalização de endereços
+│  │   └─ exporter.py       # Funções para gerar CSV/SQL
+├─ frontend/
+│  ├─ package.json
+│  ├─ src/
+│  │   ├─ components/       # Componentes React
+│  │   ├─ pages/            # Páginas: Upload, Resultados
+│  │   └─ services/         # Serviços de API (fetch/axios)
+│  └─ public/               # Assets públicos (CSS, imagens)
+
+---
+
+## Backend (Python + FastAPI)
+
+- **Endpoints:**
+  1. `/upload` (POST): Recebe CSV ou SQL, valida formato, converte em JSON, persiste no banco.
+  2. `/addresses` (GET): Retorna todos os endereços processados.
+  3. `/addresses/{id}` (GET): Retorna endereço específico.
+  4. `/export` (GET): Exporta todos os endereços processados em CSV ou SQL.
+
+- **Funcionalidades:**
+  - Normalização e parsing de endereços (logradouro, número, bairro, cidade, UF, CEP).
+  - Cálculo de score e classificação (MATCH_CONFIRMADO, MATCH_PROVÁVEL, etc.).
+  - Logs e auditoria básica.
+  - Preparado para receber dados do n8n futuramente (webhook ou API call).
+
+- **Tecnologias e práticas:**
+  - Python 3.10+, FastAPI, Pydantic, SQLAlchemy.
+  - Async/await para chamadas assíncronas.
+  - Tratamento de erros e validação de inputs.
+  - Modularização clara (routes, services, models, database).
+
+---
+
+## Frontend (React.js)
+
+- **Páginas principais:**
+  1. Upload: Formulário para envio de CSV/SQL, validação de arquivos e feedback de sucesso/erro.
+  2. Resultados: Tabela com endereços processados, score, status, provedor vencedor, botão de exportação CSV/SQL.
+
+- **Funcionalidades:**
+  - Consumo de endpoints REST do backend usando fetch ou Axios.
+  - Interface responsiva e intuitiva.
+  - Componentes reutilizáveis e bem organizados.
+
+- **Estrutura recomendada:**
+  - `components/` para botões, tabelas, modais.
+  - `pages/` para UploadPage e ResultsPage.
+  - `services/api.js` para centralizar chamadas ao backend.
+
+---
+
+## Requisitos gerais para o Copilot
+
+- Gerar código funcional, completo e testável.
+- Backend e frontend separados, com comunicação via REST API.
+- Modular, comentado e organizado.
+- Sanitização e validação de inputs.
+- Preparado para integração futura com n8n.
+- Incluir exemplos de CSV/SQL para teste.
+
+**Objetivo final:** Ter um **Backend + Frontend totalmente funcionais e testáveis**. Depois disso, adicionaremos a orquestração do n8n e integraremos tudo ao GeoMatch.

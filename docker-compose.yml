@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: geomatch-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./data/geomatch.db
+      - DEFAULT_PROVIDER=viacep
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://frontend:5173
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/data:/app/data
+    networks:
+      - geomatch-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    labels:
+      - "com.example.description=GeoMatch Backend API"
+
+  # Frontend Web
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: geomatch-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - geomatch-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:5173/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+    labels:
+      - "com.example.description=GeoMatch Frontend"
+
+networks:
+  geomatch-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+    driver: local
+
