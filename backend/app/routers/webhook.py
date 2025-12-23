@@ -37,7 +37,7 @@ def webhook_process(payload: dict, db: Session = Depends(get_db)):
                     provider_name=p.name,
                     matched_address=r["matched_address"],
                     score=r["score"],
-                    metadata=r.get("metadata"),
+                    extra_metadata=r.get("metadata"),
                 )
                 db.add(pr)
                 db.commit()

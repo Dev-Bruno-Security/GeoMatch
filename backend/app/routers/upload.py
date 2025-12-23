@@ -150,6 +150,8 @@ async def upload_sql(
     db.add(AuditLog(event="upload_sql", details=f"file={file.filename}; rows={len(addresses)}"))
     db.commit()
     return out
+    db.commit()
+    return out
 
 
 @router.post("/upload", response_model=List[AddressOut])
